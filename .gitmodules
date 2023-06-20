@@ -1,0 +1,3 @@
+[submodule "aleo/wubby"]
+	path = aleo/wubby
+	url = git@github.com:arosboro/wubby.git
