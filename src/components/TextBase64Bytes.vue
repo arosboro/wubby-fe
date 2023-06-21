@@ -20,15 +20,21 @@
 import { Options, Vue } from "vue-class-component";
 
 @Options({
+  emits: ["update"],
   props: {
     label: String,
+    initValue: String,
+    initBase64: String,
+    initBytes: Array,
+    initU64: BigInt,
   },
   data: function () {
     return {
       detail: false,
-      base64: "",
-      bytes: [],
-      u64: BigInt(0),
+      value: this.initValue,
+      base64: this.initBase64,
+      bytes: this.initBytes,
+      u64: this.initU64,
       decoded: "",
     };
   },
@@ -48,6 +54,12 @@ import { Options, Vue } from "vue-class-component";
         this.u64 = this.u64 << 8n;
         this.u64 = this.u64 | BigInt(this.bytes[i]);
       }
+      this.$emit("update", {
+        value: this.value,
+        u64: this.u64,
+        bytes: this.bytes,
+        base64: this.base64,
+      });
     },
     decode() {
       // reverse u64 to bytes
@@ -70,6 +82,14 @@ import { Options, Vue } from "vue-class-component";
     toggleDetail() {
       this.detail = !this.detail;
     },
+  },
+  mounted() {
+    if (this.initValue == "" && this.initU64 > 0n) {
+      this.decode();
+      this.value = this.decoded;
+    }
+    this.update();
+    this.decode();
   },
 })
 export default class TextBase64Bytes extends Vue {
@@ -102,6 +122,10 @@ pre {
   vertical-align: middle;
   width: 88%;
   // big number should wrap to next line
+}
+pre {
+  text-wrap: wrap;
+  word-wrap: break-word;
 }
 i {
   cursor: pointer;
